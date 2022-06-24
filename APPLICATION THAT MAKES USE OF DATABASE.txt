@@ -1,0 +1,138 @@
+Main.xml
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/myLayout"
+android:stretchColumns="0" android:layout_width="fill_parent" android:layout_height="fill_parent">
+<TextView android:text="@string/title" android:layout_x="110dp" android:layout_y="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<TextView android:text="@string/empid" android:layout_x="30dp" android:layout_y="50dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<EditText android:id="@+id/editEmpid" android:inputType="number" android:layout_x="150dp" android:layout_y="50dp" android:layout_width="150dp" android:layout_height="40dp"/>
+<TextView android:text="@string/name" android:layout_x="30dp" android:layout_y="100dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<EditText android:id="@+id/editName" android:inputType="text" android:layout_x="150dp" android:layout_y="100dp" android:layout_width="150dp" android:layout_height="40dp"/>
+<TextView android:text="@string/salary" android:layout_x="30dp" android:layout_y="150dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<EditText android:id="@+id/editsalary" android:inputType="number" android:layout_x="150dp" android:layout_y="150dp" android:layout_width="150dp"
+ 
+android:layout_height="40dp"/>
+<Button android:id="@+id/btnAdd" android:text="@string/add" android:layout_x="30dp" android:layout_y="200dp" android:layout_width="130dp" android:layout_height="40dp"/>
+<Button android:id="@+id/btnDelete" android:text="@string/delete" android:layout_x="160dp" android:layout_y="200dp" android:layout_width="130dp" android:layout_height="40dp"/>n
+<Button android:id="@+id/btnModify" android:text="@string/modify" android:layout_x="30dp" android:layout_y="250dp" android:layout_width="130dp" android:layout_height="40dp"/>
+<Button android:id="@+id/btnView" android:text="@string/view" android:layout_x="160dp" android:layout_y="250dp" android:layout_width="130dp" android:layout_height="40dp"/>
+<Button android:id="@+id/btnViewAll" android:text="@string/view_all" android:layout_x="85dp" android:layout_y="300dp" android:layout_width="150dp" android:layout_height="40dp"/>
+</AbsoluteLayout>
+string.xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">Employee detail1</string>
+<string name="hello">Hello World, Employee detail Activity!</string><string name="title">Employee Details</string><string name="empid">Enter Employee ID:
+</string>
+<string name="name">Enter Name: </string>
+<string name="salary">Enter salary: </string>
+<string name="add">Add Employee</string>
+<string name="delete">Delete Employee</string>
+<string name="modify">Modify Employee</string>
+<string name="view">View Employee</string>
+<string name="view_all">View All Employee</string>
+</resources>
+ 
+Mainactivity .java
+
+
+//import android.R;
+import android.app.Activity;
+import android.app.AlertDialog.Builder; import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase; import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener; import android.widget.Button;
+import android.widget.EditText;
+public class EmployeedetailActivity extends Activity implements OnClickListener { EditTexteditEmpid,editName,editsalary;
+Button btnAdd,btnDelete,btnModify,btnView,btnViewAll; SQLiteDatabase db;
+/** Called when the activity is first created. */ @Override
+public void onCreate(Bundle savedInstanceState)
+{
+super.onCreate(savedInstanceState); setContentView(R.layout.main); editEmpid=(EditText)findViewById(R.id.editEmpid); editName=(EditText)findViewById(R.id.editName); editsalary=(EditText)findViewById(R.id.editsalary); btnAdd=(Button)findViewById(R.id.btnAdd); btnDelete=(Button)findViewById(R.id.btnDelete); btnModify=(Button)findViewById(R.id.btnModify); btnView=(Button)findViewById(R.id.btnView); btnViewAll=(Button)findViewById(R.id.btnViewAll); btnAdd.setOnClickListener(this); btnDelete.setOnClickListener(this); btnModify.setOnClickListener(tis); btnView.setOnClickListener(this); btnViewAll.setOnClickListener(this);
+db=openOrCreateDatabase("EmployeeDB", Context.MODE_PRIVATE, null); db.execSQL("CREATE TABLE IF NOT EXISTS employee(empid VARCHAR,nameVARCHAR,salary VARCHAR);");
+}
+public void onClick(View view)
+{
+if(view==btnAdd)
+{
+if(editEmpid.getText().toString().trim().length()==0|| editName.getText().toString().trim().length()==0|| editsalary.getText().toString().trim().length()==0)
+{
+ 
+showMessage("Error", "Please enter all values"); return;
+}
+db.execSQL("INSERT INTO employee VALUES('"+editEmpid.getText()+"','"+editName.getText()+"','"+editsalary.getText()+"');"); showMessage("Success", "Record added");
+clearText();
+}
+if(view==btnDelete)
+{
+if(editEmpid.getText().toString().trim().length()==0)
+{
+showMessage("Error", "Please enter Employee id"); return;
+}
+Cursor c=db.rawQuery("SELECT * FROM employee WHEREempid='"+editEmpid.getText()+"'", null); if(c.moveToFirst())
+{
+db.execSQL("DELETE FROM employee WHERE empid='"+editEmpid.getText()+"'"); showMessage("Success", "Record Deleted");
+}
+else
+{
+showMessage("Error", "Invalid Employee id");
+}
+clearText();
+}
+if(view==btnModify)
+{
+if(editEmpid.getText().toString().trim().length()==0)
+{
+showMessage("Error", "Please enter Employee id"); return;
+}
+Cursor c=db.rawQuery("SELECT * FROM employee WHEREempid='"+editEmpid.getText()+"'", null); if(c.moveToFirst())
+{
+db.execSQL("UPDATE employee SET name='"+editName.getText()+"',salary='"+editsalary.getText()+ "' WHERE empid='"+editEmpid.getText()+"'"); showMessage("Success", "Record Modified"); } else
+{
+showMessage("Error", "Invalid Rollno");
+}
+ 
+clearText();
+}
+if(view==btnView)
+{
+if(editEmpid.getText().toString().trim().length()==0)
+{
+showMessage("Error", "Please enter Employee id"); return;
+}
+Cursor c=db.rawQuery("SELECT * FROM employee WHEREempid='"+editEmpid.getText()+"'", null); if(c.moveToFirst())
+{
+editName.setText(c.getString(1)); editsalary.setText(c.getString(2));
+}
+else
+{
+showMessage("Error", "Invalid Employee id"); clearText();
+}
+}
+if(view==btnViewAll)
+{
+Cursor c=db.rawQuery("SELECT * FROM employee", null); if(c.getCount()==0)
+{
+showMessage("Error", "No records found"); return;
+}
+StringBuffer buffer=new StringBuffer(); while(c.moveToNext())
+{
+buffer.append("Employee id: "+c.getString(0)+"\n"); buffer.append("Name: "+c.getString(1)+"\n"); buffer.append("salary: "+c.getString(2)+"\n\n");
+}
+showMessage("Employee details Details", buffer.toString());
+}
+}
+public void showMessage(String title,String message)
+{
+Builder builder=new Builder(this); builder.setCancelable(true); builder.setTitle(title); builder.setMessage(message); builder.show();
+ 
+}
+public void clearText()
+{
+editEmpid.setText(""); editName.setText(""); editsalary.setText(""); editEmpid.requestFocus();
+}
+}
+
